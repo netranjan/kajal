@@ -17,15 +17,19 @@ async function connectDB() {
 
     // Seed users if not exist
     for (const [username, data] of Object.entries(USERS)) {
-      const user = await User.findOne({ username });
-      if (!user) {
+      const existingById = await User.findOne({ id: data.id });
+      const existingByUsername = await User.findOne({ username });
+
+      if (!existingById && !existingByUsername) {
         await User.create({ id: data.id, username: data.username, password: data.password });
         console.log(`Created user: ${username}`);
+      } else {
+        console.log(`User already exists: ${username} (id: ${data.id})`);
       }
     }
   } catch (err) {
     console.error('Database initialisation failed:', err);
-    process.exit(1);   // Exit if DB can't connect – prevents running without a DB
+    process.exit(1); // Exit if DB can't connect – prevents running without a DB
   }
 }
 
