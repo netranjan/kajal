@@ -57,7 +57,7 @@ function fmtDate(iso) {
 // ---- DOM builders ----
 function createMsgEl(m) {
   const mine = m.senderId === me.id;
-  const sender = m.senderId === 1 ? 'rasuv' : 'manu';
+  const sender = m.senderId === 1 ? 'rasuv' : 'kajal';
 
   const msg = document.createElement('div');
   msg.className = 'msg';
@@ -77,7 +77,7 @@ function createMsgEl(m) {
     const replyBox = document.createElement('div');
     replyBox.className = 'msg-reply';
     const strong = document.createElement('strong');
-    strong.textContent = '↩ ' + (parent ? (parent.senderId === 1 ? 'rasuv' : 'manu') : 'unknown');
+    strong.textContent = '↩ ' + (parent ? (parent.senderId === 1 ? 'rasuv' : 'kajal') : 'unknown');
     replyBox.appendChild(strong);
     const preview = document.createElement('div');
     preview.textContent = parent ? (parent.deleted ? '[deleted]' : parent.text) : '[not loaded]';
@@ -373,7 +373,7 @@ function setReply(id) {
   replyToId = id;
   const m = msgs.get(id);
   const txt = $('replyText');
-  if (m) txt.textContent = `Replying to ${m.senderId === 1 ? 'rasuv' : 'manu'}: ${m.deleted ? '[deleted]' : m.text}`;
+  if (m) txt.textContent = `Replying to ${m.senderId === 1 ? 'rasuv' : 'kajal'}: ${m.deleted ? '[deleted]' : m.text}`;
   else txt.textContent = 'Replying to unavailable message';
   $('replyBar').classList.remove('hidden');
 }
@@ -527,7 +527,7 @@ function showTyping(status) {
       let d = 'just now';
       if (s >= 5 && s < 60) d = `${s}s ago`;
       else if (s >= 60) d = `${Math.floor(s / 60)}m ago`;
-      txt.textContent = `manu is typing… (${d})`;
+      txt.textContent = `kajal is typing… (${d})`;
     };
     tick(); typingInterval = setInterval(tick, 1000);
   } else {
@@ -575,11 +575,11 @@ async function poll() {
           const first = notifIds.values().next().value;
           notifIds.delete(first);
         }
-        const sender = m.senderId === 1 ? 'rasuv' : 'manu';
+        const sender = m.senderId === 1 ? 'rasuv' : 'kajal';
         new Notification(`New message from ${sender}`, { body: m.text.substring(0, 100), icon: '/favicon.ico' });
       }
     }
-    if (me.id === 1) showTyping(data.manuStatus);
+    if (me.id === 1) showTyping(data.kajalStatus);
   } catch (e) { /* ignore */ }
 }
 
@@ -649,7 +649,7 @@ msgInput.addEventListener('input', () => {
   msgInput.style.overflowY = msgInput.scrollHeight > MAX_TA_HEIGHT ? 'auto' : 'hidden';
 });
 
-// Typing indicator (manu only)
+// Typing indicator (kajal only)
 if (me.id === 2) {
   msgInput.addEventListener('input', () => {
     fetch('/status/typing', {

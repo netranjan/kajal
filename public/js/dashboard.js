@@ -80,7 +80,7 @@ async function fetchDashboard() {
       if (status && typeof status === 'object') {
         users.push({
           id: Number(id),
-          username: Number(id) === 1 ? 'rasuv' : (Number(id) === 2 ? 'manu' : `user ${id}`),
+          username: Number(id) === 1 ? 'rasuv' : (Number(id) === 2 ? 'kajal' : `user ${id}`),
           ...status
         });
       }

@@ -1,514 +1,394 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Question = require('./models/Question');   // make sure this file exists
+const Question = require('./models/Question');
 
-// All 80+ questions (without IDs - they will be added automatically)
+// Exactly 60 questions: 30 Space Science + 30 Birds
 const allQuestions = [
     {
-        q: "Which saree is traditionally worn by Maharashtrian brides?",
-        opts: ["Nauvari", "Kanjivaram", "Banarasi", "Chanderi"],
+        q: "Which planet is known as the Red Planet?",
+        opts: ["Mars", "Venus", "Jupiter", "Mercury"],
         ans: 0,
-        fact: "The nine-yard Nauvari saree is a symbol of grace and is draped in a unique style."
+        fact: "Mars appears reddish because iron minerals in its surface rocks and dust have oxidized."
     },
     {
-        q: "Which festival is celebrated as the Marathi New Year?",
-        opts: ["Gudi Padwa", "Diwali", "Holi", "Makar Sankranti"],
-        ans: 0,
-        fact: "Gudi Padwa marks the beginning of the Hindu New Year for Maharashtrians."
-    },
-    {
-        q: "What is the traditional male attire in Punjab called?",
-        opts: ["Kurta-Pajama", "Dhoti-Kurta", "Sherwani", "Pathani"],
-        ans: 0,
-        fact: "Kurta-Pajama is a classic and comfortable outfit worn by Punjabi men."
-    },
-    {
-        q: "Which sweet is a Maharashtrian specialty made during Ganesh Chaturthi?",
-        opts: ["Modak", "Jalebi", "Gulab Jamun", "Laddoo"],
-        ans: 0,
-        fact: "Modak is considered Lord Ganesha's favorite sweet."
-    },
-    {
-        q: "Which dance form is associated with Maharashtra?",
-        opts: ["Lavani", "Bhangra", "Giddha", "Kathak"],
-        ans: 0,
-        fact: "Lavani is a vibrant folk dance known for its powerful rhythmic movements."
-    },
-    {
-        q: "Which crop is Punjab famously known as the 'Granary of India' for?",
-        opts: ["Rice", "Wheat", "Sugarcane", "Cotton"],
+        q: "Which is the largest planet in our solar system?",
+        opts: ["Saturn", "Jupiter", "Neptune", "Earth"],
         ans: 1,
-        fact: "Punjab's fertile lands produce a significant portion of India's wheat."
+        fact: "Jupiter is the largest planet in the solar system by both diameter and mass."
     },
     {
-        q: "Which festival in Punjab marks the Sikh New Year?",
-        opts: ["Baisakhi", "Lohri", "Holi", "Diwali"],
-        ans: 0,
-        fact: "Baisakhi is a harvest festival that also commemorates the formation of the Khalsa."
-    },
-    {
-        q: "Which Maharashtrian dish is made with crushed wheat and jaggery?",
-        opts: ["Puran Poli", "Bhakri", "Kharvas", "Shrikhand"],
-        ans: 0,
-        fact: "Puran Poli is a sweet flatbread enjoyed during festivals."
-    },
-    {
-        q: "Which headgear is traditionally worn by Sikh men in Punjab?",
-        opts: ["Turban", "Pagdi", "Patka", "Chandni"],
-        ans: 1,
-        fact: "The Pagdi (turban) is an integral part of Sikh identity and pride."
-    },
-    {
-        q: "Which famous dance form originated in Punjab?",
-        opts: ["Bhangra", "Lavani", "Garba", "Dandiya"],
-        ans: 0,
-        fact: "Bhangra is a high-energy dance that originated in the Punjab region."
-    },
-    {
-        q: "Which Maharashtrian festival involves married women celebrating their marital status?",
-        opts: ["Mangala Gauri", "Karwa Chauth", "Teej", "Vat Savitri"],
-        ans: 0,
-        fact: "Mangala Gauri is a festival where women worship Goddess Gauri for marital bliss."
-    },
-    {
-        q: "What is the traditional Punjabi footwear called?",
-        opts: ["Jutti", "Kolhapuri", "Mojari", "Chappal"],
-        ans: 0,
-        fact: "Punjabi Juttis are handcrafted footwear known for their intricate embroidery."
-    },
-    {
-        q: "Which Maharashtrian dish is known as the 'queen of sweets'?",
-        opts: ["Puran Poli", "Modak", "Shrikhand", "Basundi"],
+        q: "Which planet is closest to the Sun?",
+        opts: ["Venus", "Earth", "Mercury", "Mars"],
         ans: 2,
-        fact: "Shrikhand is a creamy, rich dessert made from strained yogurt."
+        fact: "Mercury is the innermost planet and completes an orbit around the Sun in about 88 Earth days."
     },
     {
-        q: "Which festival is also known as the 'Festival of Love' in Punjab?",
-        opts: ["Lohri", "Baisakhi", "Holi", "Teej"],
+        q: "Which planet is famous for its prominent ring system?",
+        opts: ["Mars", "Saturn", "Venus", "Mercury"],
+        ans: 1,
+        fact: "Saturn has the most extensive and easily visible ring system in the solar system."
+    },
+    {
+        q: "What is the name of Earth's natural satellite?",
+        opts: ["Europa", "Titan", "Moon", "Phobos"],
         ans: 2,
-        fact: "Holi is celebrated with colours and joy, spreading love and happiness."
+        fact: "The Moon is Earth's only natural satellite and takes about 27.3 days to orbit Earth relative to the stars."
     },
     {
-        q: "Which Maharashtrian snack is made from flattened rice and peanuts?",
-        opts: ["Chivda", "Farsan", "Kanda Bhaji", "Bhel"],
-        ans: 0,
-        fact: "Chivda is a crispy and savory snack popular during the monsoon."
-    },
-    {
-        q: "Which state is known as the 'Land of Five Rivers'?",
-        opts: ["Punjab", "Maharashtra", "Rajasthan", "Uttar Pradesh"],
-        ans: 0,
-        fact: "Punjab's name means 'land of five rivers' — Beas, Chenab, Jhelum, Ravi, and Sutlej."
-    },
-    {
-        q: "What is the traditional Maharashtrian jewellery worn by married women?",
-        opts: ["Mangalsutra", "Nath", "Bangles", "All of these"],
-        ans: 3,
-        fact: "Each piece of jewellery holds cultural and emotional significance in Maharashtra."
-    },
-    {
-        q: "Which Punjabi dish is known as the 'national dish' of Punjab?",
-        opts: ["Sarson da Saag and Makki di Roti", "Butter Chicken", "Dal Makhani", "Chole Bhature"],
-        ans: 0,
-        fact: "This wholesome combination is a staple during winter in Punjab."
-    },
-    {
-        q: "Which Maharashtrian ceremony marks the coming-of-age of a girl?",
-        opts: ["Munj", "Upanayan", "Halad", "Mehendi"],
-        ans: 0,
-        fact: "Munj is a traditional rite of passage for girls in Maharashtra."
-    },
-    {
-        q: "Which dance is performed by women in Punjab during celebrations?",
-        opts: ["Giddha", "Bhangra", "Lavani", "Garba"],
-        ans: 0,
-        fact: "Giddha is a lively and graceful dance performed by Punjabi women."
-    },
-    {
-        q: "Which Maharashtrian dish is made from curd and sugar?",
-        opts: ["Shrikhand", "Kheer", "Basundi", "Raita"],
-        ans: 0,
-        fact: "Shrikhand is a sweet and tangy dessert made from hung curd."
-    },
-    {
-        q: "Which festival involves worshipping the Sun God in Punjab?",
-        opts: ["Lohri", "Makar Sankranti", "Baisakhi", "Holi"],
+        q: "What force keeps planets in orbit around the Sun?",
+        opts: ["Magnetism", "Gravity", "Friction", "Electricity"],
         ans: 1,
-        fact: "Makar Sankranti is a harvest festival dedicated to the Sun God."
+        fact: "The Sun's gravity provides the inward pull that keeps planets in their orbits."
     },
     {
-        q: "Which traditional Maharashtrian utensil is used to make bhakri?",
-        opts: ["Tava", "Tondale", "Handi", "Kadhai"],
+        q: "What is a star?",
+        opts: ["A rocky planet", "A ball of hot plasma", "A frozen moon", "A cloud of dust"],
         ans: 1,
-        fact: "The Tondale is a flat cast-iron pan used to cook bhakri."
+        fact: "Stars are enormous, hot balls of plasma that produce energy through nuclear fusion in their cores."
     },
     {
-        q: "Which state celebrates 'Makar Sankranti' with great fervor?",
-        opts: ["Maharashtra", "Punjab", "Both", "Neither"],
+        q: "What galaxy contains our solar system?",
+        opts: ["Andromeda Galaxy", "Whirlpool Galaxy", "Milky Way Galaxy", "Sombrero Galaxy"],
         ans: 2,
-        fact: "Makar Sankranti is celebrated across India with kite flying and feasting."
+        fact: "Our solar system is located in the Milky Way, a large spiral galaxy."
     },
     {
-        q: "What is the traditional Punjabi wedding dress for the groom?",
-        opts: ["Sherwani", "Kurta Pajama", "Dhoti", "Safari"],
-        ans: 0,
-        fact: "The Sherwani is a regal attire that exudes elegance and tradition."
-    },
-    {
-        q: "Which Maharashtrian food is eaten during fasting days?",
-        opts: ["Sabudana Khichdi", "Puran Poli", "Bhakri", "Thalipeeth"],
-        ans: 0,
-        fact: "Sabudana Khichdi is a light and comforting meal during fasts."
-    },
-    {
-        q: "Which Punjabi tradition involves the bride wearing red and gold?",
-        opts: ["Salwar Kameez", "Lehenga", "Ghagra", "Saree"],
+        q: "What is the Sun mainly made of?",
+        opts: ["Iron and rock", "Hydrogen and helium", "Oxygen and carbon", "Water and nitrogen"],
         ans: 1,
-        fact: "Red symbolizes prosperity and love in Punjabi weddings."
+        fact: "The Sun is composed mostly of hydrogen and helium."
     },
     {
-        q: "Which Maharashtrian folk theatre form is famous?",
-        opts: ["Tamasha", "Nautanki", "Bhavai", "Yakshagana"],
-        ans: 0,
-        fact: "Tamasha is a lively performance art combining music, dance, and drama."
-    },
-    {
-        q: "Which festival is known as the 'festival of dolls' in Maharashtra?",
-        opts: ["Gudi Padwa", "Navratri", "Bhai Dooj", "Baisakhi"],
+        q: "Which planet has the hottest average surface temperature?",
+        opts: ["Mercury", "Venus", "Mars", "Jupiter"],
         ans: 1,
-        fact: "During Navratri, 'Golu' or doll displays are arranged in many Maharashtrian homes."
+        fact: "Venus is the hottest planet on average because its thick carbon-dioxide atmosphere creates an intense greenhouse effect."
     },
     {
-        q: "Which Punjabi dish is made from chickpeas and bread?",
-        opts: ["Chole Bhature", "Dal Makhani", "Sarson ka Saag", "Pindi Chole"],
-        ans: 0,
-        fact: "Chole Bhature is a popular and hearty Punjabi dish."
-    },
-    {
-        q: "Which Maharashtrian tradition involves gifting a coconut to the bride?",
-        opts: ["Munj", "Halad", "Sakhar Puda", "Tilak"],
+        q: "What is a light-year used to measure?",
+        opts: ["Time", "Mass", "Distance", "Temperature"],
         ans: 2,
-        fact: "Sakhar Puda is a ritual where coconut is gifted as a symbol of prosperity."
+        fact: "A light-year is a unit of distance equal to the distance light travels in one year."
     },
     {
-        q: "Which Punjabi word means 'a beautiful woman'?",
-        opts: ["Sohni", "Gori", "Kudi", "Heer"],
+        q: "What do we call a rocky object that enters Earth's atmosphere and produces a streak of light?",
+        opts: ["Meteor", "Asteroid", "Comet", "Planet"],
         ans: 0,
-        fact: "Sohni is a term of endearment used for a beautiful woman."
+        fact: "A meteor is the visible streak produced when a meteoroid heats up while passing through an atmosphere."
     },
     {
-        q: "Which Maharashtrian sweet is made using coconut and sugar?",
-        opts: ["Karanji", "Modak", "Puran Poli", "Anarsa"],
+        q: "Which planet rotates on its side compared with most other planets?",
+        opts: ["Uranus", "Mars", "Earth", "Mercury"],
         ans: 0,
-        fact: "Karanji is a crescent-shaped sweet filled with coconut and sugar."
+        fact: "Uranus has an extreme axial tilt of about 98 degrees, making it appear to rotate on its side."
     },
     {
-        q: "Which state celebrates 'Lohri' as a harvest festival?",
-        opts: ["Punjab", "Maharashtra", "Rajasthan", "Bihar"],
-        ans: 0,
-        fact: "Lohri is a winter harvest festival celebrated with bonfires and sweets."
-    },
-    {
-        q: "Which Maharashtrian fabric is known for its light weight and comfort?",
-        opts: ["Paithani", "Kanjivaram", "Chanderi", "Linen"],
-        ans: 0,
-        fact: "Paithani is a silk fabric with intricate gold borders, prized for its elegance."
-    },
-    {
-        q: "Which Punjabi word is used to wish 'May you live long'?",
-        opts: ["Chardi Kala", "Sat Sri Akal", "Jeeve", "Rabb Rakha"],
-        ans: 0,
-        fact: "Chardi Kala is an expression of positivity and well-being."
-    },
-    {
-        q: "Which Maharashtrian dish is made of fermented rice?",
-        opts: ["Khichdi", "Kanji", "Dosa", "Idli"],
+        q: "What is the largest moon in the solar system?",
+        opts: ["Titan", "Ganymede", "Europa", "Triton"],
         ans: 1,
-        fact: "Kanji is a fermented rice drink that aids digestion."
+        fact: "Ganymede, a moon of Jupiter, is the largest moon in the solar system."
     },
     {
-        q: "Which Punjabi folk instrument is played during Bhangra?",
-        opts: ["Dhol", "Tabla", "Harmonium", "Sitar"],
-        ans: 0,
-        fact: "The Dhol is the heart of Bhangra music, setting the rhythm for dance."
+        q: "Which planet is known for the Great Red Spot?",
+        opts: ["Saturn", "Neptune", "Jupiter", "Mars"],
+        ans: 2,
+        fact: "Jupiter's Great Red Spot is a gigantic long-lasting storm in its atmosphere."
     },
     {
-        q: "Which Maharashtrian tradition involves the groom applying tilak on the bride?",
-        opts: ["Halad", "Mangal Phera", "Saptapadi", "Kanyadaan"],
-        ans: 0,
-        fact: "Halad is the turmeric ceremony, a sacred pre-wedding ritual."
-    },
-    {
-        q: "Which Punjabi dish is made with lentils and is a staple in every home?",
-        opts: ["Dal Makhani", "Rajma", "Chole", "Lobia"],
-        ans: 0,
-        fact: "Dal Makhani is a rich and creamy lentil dish enjoyed across Punjab."
-    },
-    {
-        q: "Which Maharashtrian festival celebrates women and their marital bliss?",
-        opts: ["Kojagiri", "Vat Savitri", "Mangala Gauri", "Both B and C"],
-        ans: 3,
-        fact: "Both Vat Savitri and Mangala Gauri are festivals honoring women and marriage."
-    },
-    {
-        q: "Which Maharashtrian sweet is prepared during Diwali?",
-        opts: ["Anarsa", "Jalebi", "Gulab Jamun", "Rasgulla"],
-        ans: 0,
-        fact: "Anarsa is a traditional Diwali sweet made from rice flour and jaggery."
-    },
-    {
-        q: "Which Punjabi drink is made from fermented mangoes?",
-        opts: ["Lassi", "Kanji", "Chhach", "Aam Panna"],
+        q: "What is the name of the boundary around a black hole beyond which light cannot escape?",
+        opts: ["Solar wind", "Event horizon", "Asteroid belt", "Magnetosphere"],
         ans: 1,
-        fact: "Kanji is a tangy drink made from fermented mangoes and spices."
+        fact: "The event horizon is the boundary beyond which escape from a black hole is impossible."
     },
     {
-        q: "Which Maharashtrian garment is worn by women during traditional ceremonies?",
-        opts: ["Nauvari Saree", "Choli", "Ghaghra", "Salwar"],
+        q: "What is a comet mostly made of?",
+        opts: ["Ice, dust and rock", "Molten iron", "Liquid water", "Pure gas"],
         ans: 0,
-        fact: "The Nauvari saree is a nine-yard drape that is both elegant and practical."
+        fact: "Comets contain ice mixed with dust and rocky material and can develop glowing comas and tails near the Sun."
     },
     {
-        q: "Which Maharashtrian folk song is sung during weddings?",
-        opts: ["Powada", "Lavani", "Bhavgeet", "Ovi"],
-        ans: 3,
-        fact: "Ovi are traditional songs sung by women during weddings and ceremonies."
-    },
-    {
-        q: "Which state is known for the 'Lavani' dance form?",
-        opts: ["Maharashtra", "Punjab", "Karnataka", "Andhra Pradesh"],
-        ans: 0,
-        fact: "Lavani is a folk dance of Maharashtra known for its rhythm and storytelling."
-    },
-    {
-        q: "Which Punjabi wedding ritual involves the couple walking around the holy fire?",
-        opts: ["Anand Karaj", "Pheras", "Varmala", "Kanyadaan"],
-        ans: 0,
-        fact: "Anand Karaj is the Sikh wedding ceremony, which includes circumambulation around the Guru Granth Sahib."
-    },
-    {
-        q: "Which Maharashtrian snack is made from besan (gram flour)?",
-        opts: ["Chivda", "Farsan", "Kanda Bhaji", "Puran Poli"],
+        q: "Which planet has the fastest rotation in the solar system?",
+        opts: ["Earth", "Jupiter", "Saturn", "Neptune"],
         ans: 1,
-        fact: "Farsan is a savory snack made from gram flour and spices."
+        fact: "Jupiter rotates once in roughly 10 hours, the fastest rotation of any planet."
     },
     {
-        q: "Which Maharashtrian festival involves unmarried girls swinging on a jhula?",
-        opts: ["Mangala Gauri", "Gudi Padwa", "Makar Sankranti", "Holi"],
-        ans: 0,
-        fact: "During Mangala Gauri, girls celebrate with swings and songs."
+        q: "What causes Earth's seasons?",
+        opts: ["Earth's distance from the Sun alone", "The Moon's gravity", "Earth's axial tilt as it orbits the Sun", "Solar flares"],
+        ans: 2,
+        fact: "Earth's approximately 23.5-degree axial tilt changes how sunlight is distributed during its orbit."
     },
     {
-        q: "Which Punjabi dish is a stuffed bread that is immensely popular?",
-        opts: ["Aloo Paratha", "Paneer Paratha", "Gobi Paratha", "All of these"],
-        ans: 3,
-        fact: "Stuffed parathas are a breakfast favourite in Punjab."
-    },
-    {
-        q: "Which Maharashtrian sweet is made with coconut and khoya?",
-        opts: ["Karanji", "Modak", "Puran Poli", "Anarsa"],
-        ans: 0,
-        fact: "Karanji is a delicious sweet filled with coconut and khoya."
-    },
-    {
-        q: "Which state celebrates 'Punjab Day'?",
-        opts: ["Punjab", "Maharashtra", "Haryana", "Himachal Pradesh"],
-        ans: 0,
-        fact: "Punjab Day is celebrated to honour the state's formation."
-    },
-    {
-        q: "Which Maharashtrian tradition involves the couple taking seven steps together?",
-        opts: ["Saptapadi", "Mangal Phera", "Kanyadaan", "Halad"],
-        ans: 0,
-        fact: "Saptapadi is the seven-step ritual that is central to Hindu weddings."
-    },
-    {
-        q: "Which Maharashtrian snack is made of rice flour and chutney?",
-        opts: ["Idli", "Dosa", "Dhokla", "Khandvi"],
+        q: "What is the asteroid belt mainly located between?",
+        opts: ["Earth and Mars", "Mars and Jupiter", "Jupiter and Saturn", "Venus and Earth"],
         ans: 1,
-        fact: "Dosa is a crispy crepe made from fermented rice batter."
+        fact: "Most known solar-system asteroids orbit in the main asteroid belt between Mars and Jupiter."
     },
     {
-        q: "Which state is famous for its 'Tanpat' saris?",
-        opts: ["Maharashtra", "Punjab", "Tamil Nadu", "Odisha"],
+        q: "Which planet is farthest from the Sun among the eight planets?",
+        opts: ["Uranus", "Saturn", "Neptune", "Jupiter"],
+        ans: 2,
+        fact: "Neptune is the eighth and farthest recognized planet from the Sun."
+    },
+    {
+        q: "What is a nebula?",
+        opts: ["A type of planet", "A cloud of gas and dust in space", "A kind of asteroid", "A black hole's surface"],
+        ans: 1,
+        fact: "Nebulae are large clouds of gas and dust found throughout galaxies."
+    },
+    {
+        q: "Which planet has the longest day measured by its rotation period?",
+        opts: ["Venus", "Mars", "Earth", "Mercury"],
         ans: 0,
-        fact: "Tanpat sarees are a traditional handloom weave from Maharashtra."
+        fact: "Venus rotates extremely slowly; one rotation relative to the stars takes about 243 Earth days."
     },
     {
-        q: "Which Punjabi festival is celebrated with the planting of wheat?",
-        opts: ["Baisakhi", "Lohri", "Makar Sankranti", "Holi"],
+        q: "What powers the Sun?",
+        opts: ["Burning coal", "Nuclear fusion", "Chemical combustion", "Lightning"],
+        ans: 1,
+        fact: "The Sun generates most of its energy by nuclear fusion, converting hydrogen into helium."
+    },
+    {
+        q: "What is the name of the first human-made object to reach the Moon?",
+        opts: ["Apollo 11", "Luna 2", "Voyager 1", "Sputnik 1"],
+        ans: 1,
+        fact: "The Soviet Luna 2 spacecraft became the first human-made object to reach the Moon in 1959."
+    },
+    {
+        q: "Which planet is known for having a day longer than its year?",
+        opts: ["Mars", "Venus", "Earth", "Neptune"],
+        ans: 1,
+        fact: "Venus takes about 243 Earth days to rotate once but about 225 Earth days to orbit the Sun."
+    },
+    {
+        q: "What is a supernova?",
+        opts: ["A type of comet", "A powerful stellar explosion", "A small asteroid", "A planet forming its rings"],
+        ans: 1,
+        fact: "A supernova is a powerful explosion associated with the death of certain stars."
+    },
+    {
+        q: "Which moon of Saturn has a thick atmosphere and lakes of liquid methane and ethane?",
+        opts: ["Titan", "Enceladus", "Rhea", "Mimas"],
         ans: 0,
-        fact: "Baisakhi marks the beginning of the harvest season in Punjab."
+        fact: "Titan is Saturn's largest moon and has a dense nitrogen-rich atmosphere and surface lakes of liquid hydrocarbons."
     },
     {
-        q: "Which state is known for its 'Waghya-Murya' folk dance?",
-        opts: ["Maharashtra", "Punjab", "Rajasthan", "Gujarat"],
+        q: "What is the name of the first artificial satellite launched into space?",
+        opts: ["Apollo 8", "Sputnik 1", "Hubble", "Luna 1"],
+        ans: 1,
+        fact: "Sputnik 1, launched in 1957, was the first artificial satellite to orbit Earth."
+    },
+    {
+        q: "What does a telescope primarily help astronomers do?",
+        opts: ["Create gravity", "Collect and analyze light", "Change planetary orbits", "Stop solar wind"],
+        ans: 1,
+        fact: "Telescopes collect electromagnetic radiation so astronomers can observe and study distant objects."
+    },
+
+    {
+        q: "Which bird is the largest living bird?",
+        opts: ["Eagle", "Ostrich", "Swan", "Albatross"],
+        ans: 1,
+        fact: "The ostrich is the largest living bird and is also the fastest-running bird on land."
+    },
+    {
+        q: "Which bird is known for its ability to mimic human speech?",
+        opts: ["Parrot", "Penguin", "Ostrich", "Owl"],
         ans: 0,
-        fact: "Waghya-Murya is a folk dance that depicts the hunting of a tiger."
+        fact: "Many parrots can imitate human speech and other sounds because of their vocal learning abilities."
     },
     {
-        q: "Which Punjabi dish is made with yoghurt and is a summer staple?",
-        opts: ["Lassi", "Chhach", "Raita", "All of these"],
-        ans: 3,
-        fact: "Lassi, Chhach, and Raita are all refreshing yoghurt-based drinks and sides."
-    },
-    {
-        q: "Which Maharashtrian festival is associated with the goddess Gauri?",
-        opts: ["Mangala Gauri", "Gudi Padwa", "Navratri", "Baisakhi"],
+        q: "Which bird is the fastest when diving?",
+        opts: ["Peregrine Falcon", "Eagle", "Swan", "Heron"],
         ans: 0,
-        fact: "Mangala Gauri is a festival dedicated to the goddess Gauri, the consort of Shiva."
+        fact: "The peregrine falcon can exceed 300 km/h during a hunting dive, making it the fastest animal in a dive."
     },
     {
-        q: "Which state is known for its vibrant 'Ganesh Chaturthi' celebrations?",
-        opts: ["Maharashtra", "Punjab", "Kerala", "Tamil Nadu"],
+        q: "Which bird cannot fly but is an excellent swimmer?",
+        opts: ["Penguin", "Eagle", "Sparrow", "Parrot"],
         ans: 0,
-        fact: "Ganesh Chaturthi is celebrated with great enthusiasm in Maharashtra."
+        fact: "Penguins are flightless birds whose wings have evolved into flipper-like structures for swimming."
     },
     {
-        q: "Which Punjabi dish is a type of flatbread made in tandoor?",
-        opts: ["Naan", "Roti", "Paratha", "Kulcha"],
+        q: "What do birds use their beaks for?",
+        opts: ["Only singing", "Feeding and other tasks", "Only flying", "Only sleeping"],
+        ans: 1,
+        fact: "Bird beaks are adapted for feeding and can also be used for grooming, defense, nest building and other tasks."
+    },
+    {
+        q: "Which bird is famous for its long, colorful tail feathers?",
+        opts: ["Peacock", "Crow", "Pigeon", "Duck"],
         ans: 0,
-        fact: "Naan is a leavened bread baked in a tandoor, popular in Punjabi cuisine."
+        fact: "The male peacock displays its elaborate train of tail feathers during courtship."
     },
     {
-        q: "Which Maharashtrian tradition involves applying turmeric paste to the bride and groom?",
-        opts: ["Halad", "Munj", "Saptapadi", "Mangal Phera"],
+        q: "Which bird is mainly active at night and is known for excellent low-light vision?",
+        opts: ["Owl", "Swan", "Parrot", "Peacock"],
         ans: 0,
-        fact: "Halad ceremony uses turmeric paste for purification and blessings."
+        fact: "Owls are mostly nocturnal and have adaptations that help them hunt in low-light conditions."
     },
     {
-        q: "Which state is known for its 'Bhangra' and 'Giddha' dances?",
-        opts: ["Punjab", "Maharashtra", "Gujarat", "Rajasthan"],
+        q: "Which bird is known for storing food in caches?",
+        opts: ["Woodpecker", "Kingfisher", "Penguin", "Flamingo"],
         ans: 0,
-        fact: "Punjab is the home of Bhangra and Giddha, the energetic folk dances."
+        fact: "Many woodpeckers, including acorn woodpeckers, store food in holes or crevices for later use."
     },
     {
-        q: "Which Maharashtrian ritual involves the bride's brother giving her away?",
-        opts: ["Kanyadaan", "Munj", "Halad", "Sakhar Puda"],
+        q: "What do flamingos often eat using their specialized bills?",
+        opts: ["Algae and small aquatic organisms", "Large mammals", "Tree bark", "Seeds only"],
         ans: 0,
-        fact: "Kanyadaan is a sacred ritual where the brother gives the bride away."
+        fact: "Flamingos filter-feed on algae and small aquatic organisms from shallow water."
     },
     {
-        q: "Which state is famous for its 'Mumbai' and 'Pune' cities?",
-        opts: ["Maharashtra", "Punjab", "Karnataka", "Gujarat"],
+        q: "Which bird is famous for building large stick nests and often lives near water?",
+        opts: ["Bald Eagle", "Sparrow", "Hummingbird", "Swift"],
         ans: 0,
-        fact: "Mumbai and Pune are major cities in Maharashtra known for their culture and history."
+        fact: "Bald eagles build very large nests, often in tall trees near lakes, rivers or coastlines."
     },
     {
-        q: "Which Maharashtrian sweet is a winter specialty?",
-        opts: ["Tilgul", "Modak", "Shrikhand", "Puran Poli"],
+        q: "Which bird can hover in place while feeding from flowers?",
+        opts: ["Hummingbird", "Crow", "Ostrich", "Penguin"],
         ans: 0,
-        fact: "Tilgul is a sweet made of sesame and jaggery, traditionally eaten during winter."
+        fact: "Hummingbirds can hover by rapidly beating their wings and use long bills to reach flower nectar."
     },
     {
-        q: "Which Punjabi word means 'love' or 'affection'?",
-        opts: ["Ishq", "Pyar", "Muhabbat", "All of these"],
-        ans: 3,
-        fact: "Ishq, Pyar, and Muhabbat are all Urdu/Punjabi words for love."
-    },
-    {
-        q: "Which Maharashtrian snack is made from rice flour and is steamed?",
-        opts: ["Idli", "Dosa", "Dhokla", "Modak"],
+        q: "Which bird is known for its distinctive laughing call and is a member of the kingfisher family?",
+        opts: ["Kookaburra", "Pelican", "Crane", "Vulture"],
         ans: 0,
-        fact: "Idli is a steamed rice cake, a popular breakfast in Maharashtra."
+        fact: "The kookaburra is a kingfisher-family bird famous for its distinctive call that sounds like laughter."
     },
     {
-        q: "Which Punjabi word means 'a celebration'?",
-        opts: ["Mela", "Utsav", "Khedan", "Tehar"],
+        q: "Which bird has a large pouch under its bill for catching fish?",
+        opts: ["Pelican", "Owl", "Sparrow", "Falcon"],
         ans: 0,
-        fact: "Mela is a large gathering that celebrates culture and traditions."
+        fact: "Pelicans use their expandable throat pouches to scoop up fish and water."
     },
     {
-        q: "Which state is known for its 'Kolhapuri' footwear?",
-        opts: ["Maharashtra", "Punjab", "Rajasthan", "Gujarat"],
+        q: "Which bird is known for its long-distance migration between polar regions?",
+        opts: ["Arctic Tern", "Peacock", "Ostrich", "Kiwi"],
         ans: 0,
-        fact: "Kolhapuri chappals are a traditional handcrafted footwear from Maharashtra."
+        fact: "Arctic terns make one of the longest regular migrations of any animal, traveling between Arctic and Antarctic regions."
     },
     {
-        q: "Which Punjabi word means 'a close friend'?",
-        opts: ["Yaar", "Mitr", "Dost", "Sakhi"],
+        q: "Which bird is the national bird of India?",
+        opts: ["Peacock", "Eagle", "Sparrow", "Swan"],
         ans: 0,
-        fact: "Yaar is a term of endearment for a close friend in Punjabi."
+        fact: "The Indian peafowl, commonly called the peacock, is the national bird of India."
     },
     {
-        q: "Which Maharashtrian festival celebrates cattle and their importance?",
-        opts: ["Polhu", "Makar Sankranti", "Gudi Padwa", "Baisakhi"],
+        q: "Which bird is famous for using its strong beak to crack nuts?",
+        opts: ["Macaw", "Flamingo", "Penguin", "Heron"],
         ans: 0,
-        fact: "Polhu is a festival where cattle are worshipped for their role in agriculture."
+        fact: "Macaws have powerful curved beaks that can crack hard nuts and seeds."
     },
     {
-        q: "Which state is known for its 'Paithani' sarees?",
-        opts: ["Maharashtra", "Punjab", "Karnataka", "Tamil Nadu"],
+        q: "Which bird is known for walking on the ground and having a long neck but cannot fly?",
+        opts: ["Emu", "Swan", "Parrot", "Pigeon"],
         ans: 0,
-        fact: "Paithani sarees are a traditional handwoven silk saree from Maharashtra."
+        fact: "The emu is a large flightless bird native to Australia."
     },
     {
-        q: "Which Punjabi word means 'the beloved'?",
-        opts: ["Sohni", "Heer", "Mahi", "All of these"],
-        ans: 3,
-        fact: "Sohni, Heer, and Mahi are all poetic terms for the beloved."
-    },
-    {
-        q: "Which Maharashtrian dish is a stuffed bread made with lentils?",
-        opts: ["Puran Poli", "Bhakri", "Thalipeeth", "Karanji"],
+        q: "Which bird is associated with delivering messages in historical pigeon post?",
+        opts: ["Homing pigeon", "Penguin", "Owl", "Flamingo"],
         ans: 0,
-        fact: "Puran Poli is a sweet flatbread stuffed with a lentil and jaggery filling."
+        fact: "Homing pigeons have been used to carry messages because of their strong ability to navigate back to their home."
     },
     {
-        q: "Which state celebrates 'Gudi Padwa' as the New Year?",
-        opts: ["Maharashtra", "Punjab", "Karnataka", "Tamil Nadu"],
+        q: "Which bird has webbed feet that help it swim?",
+        opts: ["Duck", "Eagle", "Woodpecker", "Owl"],
         ans: 0,
-        fact: "Gudi Padwa is the Maharashtrian New Year, celebrated with great enthusiasm."
+        fact: "Ducks have webbed feet that act like paddles and help them move through water."
     },
     {
-        q: "Which Punjabi dish is a thick yoghurt-based drink?",
-        opts: ["Lassi", "Chhach", "Kheer", "Raita"],
+        q: "Which bird is known for pecking holes in tree trunks?",
+        opts: ["Woodpecker", "Swan", "Albatross", "Flamingo"],
         ans: 0,
-        fact: "Lassi is a traditional Punjabi drink made from churned yoghurt."
+        fact: "Woodpeckers use their specialized bills to excavate wood while searching for food and making nest cavities."
     },
     {
-        q: "Which Maharashtrian festival is known for its beautiful 'rangoli' designs?",
-        opts: ["Diwali", "Gudi Padwa", "Makar Sankranti", "All of these"],
-        ans: 3,
-        fact: "Rangoli is an integral part of all major festivals in Maharashtra."
-    },
-    {
-        q: "Which state is known for its 'Bhakri' and 'Puran Poli'?",
-        opts: ["Maharashtra", "Punjab", "Rajasthan", "Gujarat"],
+        q: "Which bird is famous for its enormous wingspan and life over the open ocean?",
+        opts: ["Wandering Albatross", "Sparrow", "Pigeon", "Parrot"],
         ans: 0,
-        fact: "Bhakri and Puran Poli are traditional Maharashtrian dishes."
+        fact: "The wandering albatross has one of the largest wingspans of any living bird and spends much of its life over the ocean."
+    },
+    {
+        q: "Which bird is known for catching fish by diving into water?",
+        opts: ["Kingfisher", "Peacock", "Ostrich", "Sparrow"],
+        ans: 0,
+        fact: "Kingfishers often plunge into water to catch fish and other aquatic prey."
+    },
+    {
+        q: "What are baby birds commonly called?",
+        opts: ["Chicks", "Calves", "Fawns", "Cubs"],
+        ans: 0,
+        fact: "Young birds are commonly called chicks, although some species have special names for their young."
+    },
+    {
+        q: "Which bird is famous for its ability to fly backward?",
+        opts: ["Hummingbird", "Eagle", "Owl", "Swan"],
+        ans: 0,
+        fact: "Hummingbirds are the only birds known to fly backward using their specialized wing movement."
+    },
+    {
+        q: "Which bird is commonly associated with wisdom in stories and symbolism?",
+        opts: ["Owl", "Duck", "Pigeon", "Flamingo"],
+        ans: 0,
+        fact: "Owls have long been associated with wisdom in many cultures, although the symbolism is not a scientific trait."
+    },
+    {
+        q: "Which bird has a distinctive large casque-like structure on its bill and is found in tropical forests?",
+        opts: ["Hornbill", "Swan", "Penguin", "Sparrow"],
+        ans: 0,
+        fact: "Hornbills are known for their large bills and, in many species, a casque above the bill."
+    },
+    {
+        q: "Which bird is known for turning its head very far around?",
+        opts: ["Owl", "Eagle", "Pelican", "Duck"],
+        ans: 0,
+        fact: "Many owls can rotate their heads by up to about 270 degrees because of specialized neck anatomy."
+    },
+    {
+        q: "Which bird is famous for its elaborate courtship dances and colorful plumage in New Guinea?",
+        opts: ["Bird-of-paradise", "Penguin", "Crow", "Pelican"],
+        ans: 0,
+        fact: "Many birds-of-paradise use elaborate displays, dances and specialized feathers during courtship."
+    },
+    {
+        q: "Which bird is known for its black-and-white plumage and ability to live in very cold environments?",
+        opts: ["Penguin", "Peacock", "Macaw", "Flamingo"],
+        ans: 0,
+        fact: "Penguins have dense feathers and body adaptations that help them survive in cold marine environments."
+    },
+    {
+        q: "Which bird is commonly seen building cup-shaped nests using grass, fibers and other materials?",
+        opts: ["Sparrow", "Ostrich", "Penguin", "Albatross"],
+        ans: 0,
+        fact: "Sparrows and many other small birds build cup-shaped nests from grasses, fibers and other materials."
     }
 ];
 
-
 async function seed() {
     console.log('🌱 Starting question seeding...');
+
     try {
         // Connect to MongoDB
         await mongoose.connect(process.env.MONGODB_URI);
         console.log('📡 Connected to MongoDB');
 
-        // Check if any questions already exist (optional – we still skip duplicates)
-        const existingCount = await Question.countDocuments();
-        if (existingCount > 0) {
-            console.log(`📚 ${existingCount} questions already exist. No new questions will be added (duplicates will be skipped).`);
-        }
+        // Replace the existing feed with exactly these 60 questions
+        await Question.deleteMany({});
+        console.log('🗑️ Cleared existing questions');
 
-        let added = 0;
         for (let i = 0; i < allQuestions.length; i++) {
             const q = allQuestions[i];
-            // Avoid inserting the same question text
-            const exists = await Question.findOne({ q: q.q });
-            if (!exists) {
-                await Question.create({
-                    ...q,
-                    id: i + 1   // assign ID based on position (or use a counter)
-                });
-                added++;
-            }
+
+            await Question.create({
+                ...q,
+                id: i + 1
+            });
         }
 
-        console.log(`✅ Seeding complete. ${added} new questions added.`);
+        console.log(`✅ Seeding complete. ${allQuestions.length} questions added.`);
         process.exit(0);
     } catch (error) {
         console.error('❌ Seeding failed:', error.message);
