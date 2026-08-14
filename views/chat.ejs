@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Campusfify Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/tiny-chat.css">
+</head>
+<body>
+
+  <header class="header">
+    <a href="/" class="icon-btn" aria-label="Back"><i class="fas fa-arrow-left"></i></a>
+    <div class="avatar"><%= user.id === 1 ? 'R' : 'M' %></div>
+    <div class="title"><%= user.id === 1 ? 'Chat with Manu' : 'Chat with Rasuv' %></div>
+
+    <nav class="nav-desktop">
+      <button class="btn js-refresh" type="button"><i class="fas fa-sync-alt"></i> Refresh</button>
+      <% if (user.id === 1) { %>
+        <button class="btn js-dashboard" type="button"><i class="fas fa-chart-bar"></i> Dashboard</button>
+        <button class="btn danger js-clear" type="button"><i class="fas fa-trash-alt"></i> Clear</button>
+      <% } %>
+      <a href="/logout" class="btn danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+
+    <details class="nav-mobile">
+      <summary class="icon-btn" aria-label="Menu"><i class="fas fa-ellipsis-v"></i></summary>
+      <div class="menu">
+        <button class="btn js-refresh" type="button" style="background:transparent;color:#2563eb;justify-content:flex-start;width:100%;"><i class="fas fa-sync-alt"></i> Refresh</button>
+        <% if (user.id === 1) { %>
+          <button class="btn js-dashboard" type="button" style="background:transparent;color:#2563eb;justify-content:flex-start;width:100%;"><i class="fas fa-chart-bar"></i> Dashboard</button>
+          <button class="btn danger js-clear" type="button" style="background:transparent;justify-content:flex-start;width:100%;"><i class="fas fa-trash-alt"></i> Clear</button>
+        <% } %>
+        <a href="/logout" class="btn danger" style="background:transparent;justify-content:flex-start;width:100%;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </details>
+  </header>
+
+  <div id="messages" class="messages">
+    <div class="empty" id="emptyState">
+      <span>💬</span>
+      <p>No messages yet.</p>
+      <p style="font-size:0.875rem;opacity:0.6;margin-top:0.25rem;">Be the first to say hello!</p>
+    </div>
+  </div>
+
+  <button id="newMsgs" class="new-msg-btn hidden" type="button">
+    ↓ <span id="newMsgCount">0</span>
+  </button>
+
+  <div id="typing" class="typing hidden">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span id="typingText">typing…</span>
+  </div>
+
+  <div id="replyBar" class="reply-bar hidden">
+    <span id="replyText">Replying…</span>
+    <button id="cancelReply" type="button" aria-label="Cancel reply"><i class="fas fa-times"></i></button>
+  </div>
+
+  <form id="composer" class="composer">
+    <div class="input-wrap">
+      <button type="button" id="emojiBtn" class="icon-btn" style="width:36px;height:36px;" aria-label="Emoji"><i class="far fa-smile"></i></button>
+      <textarea id="msgInput" placeholder="Type a message…" rows="1"></textarea>
+
+      <div id="emojiPicker" class="emoji-picker hidden">
+        <div class="emoji-header">
+          <span>Emoji</span>
+          <button type="button" id="emojiClose" class="icon-btn" style="width:32px;height:32px;" aria-label="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+      </div>
+    </div>
+    <button type="submit" id="sendBtn" class="send-btn">Send</button>
+  </form>
+
+  <% if (user.id === 1) { %>
+  <div id="dashModal" class="modal hidden">
+    <div class="modal-box">
+      <button id="closeDash" class="modal-close" aria-label="Close">&times;</button>
+      <h2 style="font-size:1.25rem;font-weight:600;margin-bottom:1rem;">Admin Dashboard</h2>
+      <div id="dashContent">Loading…</div>
+    </div>
+  </div>
+  <% } %>
+
+  <script>window.USER = <%- JSON.stringify(user) %>;</script>
+  <script src="/js/chat.js"></script>
+    <% if (user.id === 1) { %><script src="/js/dashboard.js?v=2"></script><% } %>
+</body>
+</html>
